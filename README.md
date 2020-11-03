@@ -1,8 +1,8 @@
 # DSN_frequency_correction
 
-This simple juypter-notebook reads a time and range rate data file created by GMAT and applies Doppler correction to GQRX.
+This simple program reads a time and range rate data file created by GMAT and applies Doppler correction to GQRX.
 
-To make it work for you edit the following in the GMAT .script file and create a suitable .gmd file using GMAT2020:
+To make it work for you, edit the following in the GMAT .script file and create a suitable .gmd file using GMAT2020:
 
 1) Provide the suitable state vector for spacecraft of interest.
 
