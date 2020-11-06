@@ -23,7 +23,7 @@ def writeCommand(cmd):
 def writeFreq(freq):
     writeCommand("F " + str(freq))
 
-gmd_file = '/home/scott/code/GMAT/R2020a/output/ve7til_2020_11_3.gmd' #uses state vector 2020-10-30T03:43:22.9642
+gmd_file = '/home/scott/code/GMAT/R2020a/output/ve7til_2020_11_6.gmd' #uses state vector 2020-10-30T03:43:22.9642
 gmd_mjd = []
 gmd_rangerate = []
 with open(gmd_file) as f:
@@ -34,27 +34,26 @@ gmd_mjd = np.array(gmd_mjd)
 gmd_rangerate = np.array(gmd_rangerate)
 t_gmd = Time(gmd_mjd + (2430000.0 - 2400000.5), scale = 'tai', format = 'mjd')
 
-t_data = Time(Time.now(), format = 'mjd')
+t_data = Time(Time.now(), scale = 'tai', format = 'mjd')
 i = 0  
 
 #Find initial index
-while t_gmd[i].to_value('mjd', 'long') < t_data.to_value('mjd', 'long'):
+while t_data > t_gmd[i]:
     i = i + 1
-    freq_last = f_carrier * (1 - 1e3*gmd_rangerate[i]/c)
     
+freq_last = f_carrier * (1 - 1e3*gmd_rangerate[i]/c)    
+writeFreq(freq_last)
 
 #loop forever and only update freqeuncy when a change is required based on rangerate data    
 while True:
-    t_data = Time(Time.now(), format = 'mjd')
-  
-    while t_gmd[i].to_value('mjd', 'long') < t_data.to_value('mjd', 'long'):  
+    t_data = Time(Time.now(), scale = 'tai', format = 'mjd')
+       
+    while  t_data > t_gmd[i]:  
         freq = f_carrier * (1 - 1e3*gmd_rangerate[i]/c)
         
         if int(freq) != int(freq_last):
             writeFreq(freq)
-            print("Frequency {:}".format(int(freq)), end="\r")
             freq_last = freq
-        i = i + 1  
-    time.sleep(0.1)      
-    
-
+        i = i + 1
+        print("Index {:5d} /".format(i),"{:5d}".format(len(t_gmd)), "- Frequency {:10.4f}".format(freq), end="\r")
+    time.sleep(0.1)
